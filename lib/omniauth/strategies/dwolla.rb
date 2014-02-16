@@ -1,31 +1,32 @@
 require 'omniauth-oauth2'
 require 'dwolla'
 
+#require 'dwolla-ruby'
+# require '/Users/bryangoettsch/.rvm/gems/ruby-1.9.3-p125@tippable0.3/gems/dwolla-ruby-2.1.0/lib/dwolla/exceptions'
+
 module OmniAuth
   module Strategies
     class Dwolla < OmniAuth::Strategies::OAuth2
+      
       DEFAULT_SCOPE = 'accountinfofull'
+      
       option :name, 'dwolla'
       option :client_options, {
         :site => 'https://www.dwolla.com',
         :authorize_url => '/oauth/v2/authenticate',
         :token_url => '/oauth/v2/token'
-      }
-      #option :provider_ignores_state, true
-      # setting that has NO effect. 
-      # If anyone can figure a way to make it work
-      # PLEASE issue a pull request. -masukomi
+      }    
 
-      uid { user.id }
+      uid { user['Id'] }
 
       info do
         prune!({
-          'name'      => user.name,
-          'latitude'  => user.latitude,
-          'longitude' => user.longitude,
-          'city'      => user.city,
-          'state'     => user.state,
-          'type'      => user.type
+          'name'      => @user_info['Name'],
+          'latitude'  => @user_info['Latitude'],
+          'longitude' => @user_info['Longitude'],
+          'city'      => @user_info['City'],
+          'state'     => @user_info['State'],
+          'type'      => @user_info['Type']
         })
       end
 
@@ -36,9 +37,10 @@ module OmniAuth
       end
 
       private
-        def user
-          @user ||= ::Dwolla::User.me(access_token.token).fetch
-        rescue ::Dwolla::RequestException => e
+        def user          
+          ::Dwolla::token = access_token.token
+          @user_info ||= ::Dwolla::Users.get()
+        rescue ::Dwolla::DwollaError => e
           raise CallbackError.new(e, e.message)
         end
 

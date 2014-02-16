@@ -27,7 +27,7 @@ END
 
   s.add_dependency 'omniauth', '~> 1.1.4'
   s.add_dependency 'omniauth-oauth2', '~> 1.1.1'
-  s.add_dependency 'dwolla-ruby', '>= 2.5.14' 
+  s.add_dependency 'dwolla-ruby', '>= 2.5.1' 
     #using >=0.0.15 results in a variety of dependency conflicts
 
   s.add_development_dependency 'rake'
